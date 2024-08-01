@@ -32,15 +32,10 @@ class Card(db.Model):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    
+
     login = db.Column(db.String(100),  nullable=False)
     # Contraseña
     password = db.Column(db.String(30), nullable=False)
-
-
-
-
-
 
 
 # Ejecutar la página de contenidos
@@ -52,9 +47,14 @@ def login():
             form_password = request.form['password']
             
             #Asignación #4. Aplicar la autorización
-            
+            users_db = User.query.all()
 
-
+            for user in users_db:
+                if form_login == user.login and form_password == user.password:
+                    return redirect('/index')
+                else:
+                    error = 'Nombre de usuario o contraseña incorrectos'
+                    return render_template('login.html', error=error)
             
         else:
             return render_template('login.html')
@@ -68,7 +68,10 @@ def reg():
         password = request.form['password']
         
         #Asignación #3. Hacer que los datos del usuario se registren en la base de datos.
-        
+        user = User(login = login, password = password)
+
+        db.session.add(user)
+        db.session.commit()
 
         
         return redirect('/')
